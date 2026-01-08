@@ -1,0 +1,11 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include CMakeLists.txt
+recursive-include src *.cpp *.h
+recursive-include pycasbin_cpp *.py
+recursive-include examples *.py *.conf *.csv
+recursive-include third_party/casbin-cpp *
+recursive-include third_party/pybind11 *
+global-exclude __pycache__
+global-exclude *.py[co]
