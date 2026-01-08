@@ -3,12 +3,7 @@
 Basic example demonstrating pycasbin-on-cpp usage
 """
 
-import sys
 import os
-
-# Add parent directory to path for local testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 from pycasbin_cpp import Enforcer
 
 def main():
