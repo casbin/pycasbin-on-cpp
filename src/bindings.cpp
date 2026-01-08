@@ -23,13 +23,22 @@
 namespace py = pybind11;
 using namespace casbin;
 
-// Helper function to convert Python args to DataList for Enforce
-DataList make_data_list(const std::vector<std::string>& args) {
-    DataList data_list;
+// Helper function to convert Python args to DataVector for Enforce
+DataVector make_data_vector(const std::vector<std::string>& args) {
+    DataVector data_vec;
     for (const auto& arg : args) {
-        data_list.push_back(arg);
+        data_vec.push_back(arg);
     }
-    return data_list;
+    return data_vec;
+}
+
+// Helper function to convert PoliciesValues to Python list
+std::vector<std::vector<std::string>> policies_values_to_vector(const PoliciesValues& policies) {
+    std::vector<std::vector<std::string>> result;
+    for (const auto& policy : policies) {
+        result.push_back(policy);
+    }
+    return result;
 }
 
 PYBIND11_MODULE(_pycasbin_cpp, m) {
@@ -46,18 +55,14 @@ PYBIND11_MODULE(_pycasbin_cpp, m) {
         
         // Enforcement
         .def("enforce", [](Enforcer& e, const std::vector<std::string>& params) {
-            DataList data = make_data_list(params);
-            auto evaluator = std::make_shared<ExprtkEvaluator>();
-            evaluator->LoadDataList(data);
-            return e.Enforce(evaluator);
+            DataVector data = make_data_vector(params);
+            return e.Enforce(data);
         }, py::arg("params"))
         
         .def("enforce_ex", [](Enforcer& e, const std::vector<std::string>& params) {
-            DataList data = make_data_list(params);
-            auto evaluator = std::make_shared<ExprtkEvaluator>();
-            evaluator->LoadDataList(data);
+            DataVector data = make_data_vector(params);
             std::vector<std::string> explain;
-            bool result = e.EnforceEx(evaluator, explain);
+            bool result = e.EnforceEx(data, explain);
             return py::make_tuple(result, explain);
         }, py::arg("params"))
         
@@ -67,9 +72,12 @@ PYBIND11_MODULE(_pycasbin_cpp, m) {
         .def("clear_policy", &Enforcer::ClearPolicy)
         
         // Policy API
-        .def("get_policy", &Enforcer::GetPolicy)
-        .def("get_filtered_policy", &Enforcer::GetFilteredPolicy,
-             py::arg("field_index"), py::arg("field_values"))
+        .def("get_policy", [](Enforcer& e) {
+            return policies_values_to_vector(e.GetPolicy());
+        })
+        .def("get_filtered_policy", [](Enforcer& e, int field_index, const std::vector<std::string>& field_values) {
+            return policies_values_to_vector(e.GetFilteredPolicy(field_index, field_values));
+        }, py::arg("field_index"), py::arg("field_values"))
         .def("has_policy", &Enforcer::HasPolicy,
              py::arg("params"))
         .def("add_policy", &Enforcer::AddPolicy,
@@ -86,9 +94,12 @@ PYBIND11_MODULE(_pycasbin_cpp, m) {
              py::arg("old_policy"), py::arg("new_policy"))
         
         // Grouping (role) policy API
-        .def("get_grouping_policy", &Enforcer::GetGroupingPolicy)
-        .def("get_filtered_grouping_policy", &Enforcer::GetFilteredGroupingPolicy,
-             py::arg("field_index"), py::arg("field_values"))
+        .def("get_grouping_policy", [](Enforcer& e) {
+            return policies_values_to_vector(e.GetGroupingPolicy());
+        })
+        .def("get_filtered_grouping_policy", [](Enforcer& e, int field_index, const std::vector<std::string>& field_values) {
+            return policies_values_to_vector(e.GetFilteredGroupingPolicy(field_index, field_values));
+        }, py::arg("field_index"), py::arg("field_values"))
         .def("has_grouping_policy", &Enforcer::HasGroupingPolicy,
              py::arg("params"))
         .def("add_grouping_policy", &Enforcer::AddGroupingPolicy,
@@ -131,14 +142,16 @@ PYBIND11_MODULE(_pycasbin_cpp, m) {
              py::arg("user"), py::arg("permission"))
         .def("delete_permissions_for_user", &Enforcer::DeletePermissionsForUser,
              py::arg("user"))
-        .def("get_permissions_for_user", &Enforcer::GetPermissionsForUser,
-             py::arg("user"))
+        .def("get_permissions_for_user", [](Enforcer& e, const std::string& user) {
+            return policies_values_to_vector(e.GetPermissionsForUser(user));
+        }, py::arg("user"))
         .def("has_permission_for_user", &Enforcer::HasPermissionForUser,
              py::arg("user"), py::arg("permission"))
         .def("get_implicit_roles_for_user", &Enforcer::GetImplicitRolesForUser,
              py::arg("name"), py::arg("domain") = std::vector<std::string>{})
-        .def("get_implicit_permissions_for_user", &Enforcer::GetImplicitPermissionsForUser,
-             py::arg("user"), py::arg("domain") = std::vector<std::string>{})
+        .def("get_implicit_permissions_for_user", [](Enforcer& e, const std::string& user, const std::vector<std::string>& domain) {
+            return policies_values_to_vector(e.GetImplicitPermissionsForUser(user, domain));
+        }, py::arg("user"), py::arg("domain") = std::vector<std::string>{})
         .def("get_implicit_users_for_permission", &Enforcer::GetImplicitUsersForPermission,
              py::arg("permission"))
         

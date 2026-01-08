@@ -14,13 +14,14 @@ add_subdirectory(third_party/pybind11)
 # Add casbin-cpp
 set(CASBIN_BUILD_TEST OFF CACHE BOOL "Build casbin-cpp tests")
 set(CASBIN_BUILD_BENCHMARK OFF CACHE BOOL "Build casbin-cpp benchmarks")
+set(CASBIN_BUILD_PYTHON_BINDINGS OFF CACHE BOOL "Build casbin-cpp Python bindings")
 add_subdirectory(third_party/casbin-cpp)
 
 # Create the Python module
 pybind11_add_module(_pycasbin_cpp src/bindings.cpp)
 
-# Link against casbin
-target_link_libraries(_pycasbin_cpp PRIVATE casbin)
+# Link against casbin and nlohmann_json
+target_link_libraries(_pycasbin_cpp PRIVATE casbin nlohmann_json::nlohmann_json)
 
 # Include casbin headers
 target_include_directories(_pycasbin_cpp PRIVATE 
