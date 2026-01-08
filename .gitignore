@@ -127,3 +127,24 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# C++ build artifacts
+*.o
+*.a
+*.dylib
+*.so.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

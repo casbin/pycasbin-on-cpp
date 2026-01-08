@@ -1,0 +1,41 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "pybind11>=2.6.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pycasbin-on-cpp"
+version = "0.1.0"
+description = "A high-performance Python wrapper for casbin-cpp"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Casbin", email = "admin@casbin.org"}
+]
+keywords = ["casbin", "access-control", "authorization", "rbac", "abac", "acl"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/casbin/pycasbin-on-cpp"
+Repository = "https://github.com/casbin/pycasbin-on-cpp"
+Documentation = "https://casbin.org/docs/en/overview"
+
+[tool.setuptools]
+packages = ["pycasbin_cpp"]
